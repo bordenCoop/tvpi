@@ -1,0 +1,187 @@
+<script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous">
+</script>
+
+<body>
+<link rel="stylesheet" type="text/css" href="main.css">
+
+
+<div>
+    <div id="pictures">
+        <img src="images/automne-1920-1080.jpg" class="displayImages" value="1">
+        <img src="images/2.PNG" class="displayImages" value="2">
+        
+    </div>
+    
+    <div id="weatherAndLogo">
+        <div id="weather">
+            <div id="weatherIcon">
+            </div>
+            <div id="weatherInfo">
+                <div id="city"></div>
+                <div id="temp"></div>
+                <div id="synopsis"></div>
+            </div>
+        </div>
+        <div id="logo">
+        <img src="images/automne-1920-1080.jpg" id="logo1">
+        <img src="images/2.PNG" id="logo2">
+        <img src="images/1.PNG" id="logo3">
+        </div>
+    </div>
+    
+    <div id="newfeed">
+
+    </div>
+</div>
+    
+    
+    
+</body>
+<script>
+    var myIndex=0;
+    var y;
+    
+    
+    changeImage();
+    /*
+        Needed: if img value = 1 - this logo
+    */
+    
+    function hideLogo(){
+        logo1.style.display="none";
+        logo2.style.display="none";
+        logo3.style.display="none";
+    }
+    
+    function changeImage(){
+        var i;
+        var x = document.getElementsByClassName("displayImages");
+        var logo1 = document.getElementById("logo1");
+        var logo2 = document.getElementById("logo2");
+        
+        for(i=0; i<x.length;i++){
+            x[i].style.display="none";
+        }
+        
+        myIndex++;
+        if(myIndex > x.length){myIndex=1}
+        {
+            x[myIndex-1].style.display="block";   
+            y=x[myIndex-1];//collects value
+        }   
+        
+        if(y.getAttribute("value")=="1"){
+            logo2.style.display="none";
+            logo1.style.display="block";
+        }
+        
+        if(y.getAttribute("value")=="2"){
+            logo1.style.display="none";
+            logo2.style.display="block";
+        }
+        
+        
+        setTimeout(changeImage,5000);
+    };
+    
+</script>
+
+<script>
+
+getweather();
+    	
+function getweather() // weather api key : e529c71a6b29bb50
+	{  
+	   $.ajax({ url :"http://api.wunderground.com/api/e529c71a6b29bb50/geolookup/conditions/q/ontario/barrie.json",
+	   dataType : "jsonp",
+	   success : function(parsed_json) 
+	               {
+	               var humid = parsed_json ['current_observation']['relative_humidity'];
+	               var location = parsed_json['location']['city'];
+	               var temp_f = parsed_json['current_observation']['temp_f'];
+	               var temp_c = parsed_json['current_observation']['temp_c'];
+	               var synopsis = parsed_json['current_observation']['weather']; 
+	               var wind = parsed_json['current_observation']['wind_string'];
+	               $("#temp").html(temp_c+"<sup>o<\/sup>C" );
+	               $("#humid").html("Humidity: "+humid);
+	               $("#city").html(location+", ON");
+	               $("#synopsis").html(synopsis);
+	               $("#wind").html( "Wind: " + wind);
+	                   
+	               if (synopsis == 'Partly Cloudy') { $('#weatherIcon').html('<img src="images-weather/m-cloudy.png"/>'); }
+	               if (synopsis == 'Drizzle') { $('#weatherIcon').html('<img src="images-weather/fair-drizzle.png" />'); }
+	               if (synopsis == 'Rain') { $('#weatherIcon').html('<img src="images-weather/rainy.png" />'); }
+	               if (synopsis == 'Snow') { $('#weatherIcon').html('<img src="images-weather/snow.png" />'); }
+	               if (synopsis == 'Mist') { $('#weatherIcon').html('<img src="images-weather/fair-drizzle.png" />'); }
+	               if (synopsis == 'Thunderstorm') { $('#weatherIcon').html('<img src="images-weather/thunderstorm.png" />'); }
+	               if (synopsis == 'Overcast') { $('#weatherIcon').html('<img src="images-weather/fair.png" style="height:100%; width:100%;"/>'); }
+	               if (synopsis == 'Clear') { $('#weatherIcon').html('<img src="images-weather/sunny2.png" />'); }
+                   if (synopsis == 'Mostly Cloudy') { $('#weatherIcon').html('<img src="images-weather/fair.png" />'); }
+                   if (synopsis == '') { $('#weatherIcon').html('<img src="images-weather/na.png" />'); }
+                   }
+	          });
+			  
+			  setInterval(function(){
+	getweather();
+},900000);
+	};
+	
+
+
+
+</script>
+
+<script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+<body>
+
+
+    
+
+
+<script>
+	
+	$(document).ready(function(){
+		rssNews();
+	});
+	
+
+	function rssNews(){
+		  var p=19;
+    var array = [];
+
+   var test;
+$.get("http://barrie.ctvnews.ca/rss/ctv-news-barrie-1.1293974", function(data) {
+    var $xml = $(data);
+    $xml.find("item").each(function(i, val) { 
+        var $this = $(this),
+            item = {
+                title: $this.find("title").text(),
+                description: $this.find("description").text()
+        };
+        
+       
+        
+        array.push(item.description);
+  		
+    });
+
+});
+ setInterval(function(){
+               
+					 document.getElementById("newfeed").innerHTML=array[p];
+					p--;     
+					if(p==0){
+					p=array.length-1;
+					}
+        },10000);
+	};
+	setInterval(function(){
+		rssNews();
+	},600000);
+</script>
